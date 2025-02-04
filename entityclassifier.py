@@ -18,6 +18,9 @@ class EntityClassifier:
             self.__candidate_labels = candidate_labels
             self.results = {} # clear all results
 
+    def update_batchsize(self, batchsize):
+        self.__batchsize = batchsize
+
     def load_entities(self, entities):
         self.entities = entities
 
