@@ -6,7 +6,7 @@ from rapidfuzz import fuzz
 from sentence_transformers import SentenceTransformer, util
 
 
-class orgsearch:
+class OrgSearch:
     """
     This class defines a data object that finds the closest matching organization names from a large database based on a given set of input queries.
     """
@@ -93,12 +93,12 @@ class orgsearch:
         self.queries = queries
 
     def clear_results(self):
-        for x in self.results.keys():
-            if type(self.queries)==str:
-                if x!=queries:
-                    results.pop(x)
-            elif x not in queries:
-                results.pop(x)
+        if type(self.queries)==str:
+            to_pop = set(self.results.keys()) - {self.queries}
+        else:
+            to_pop = set(self.results.keys()) - set(self.queries)
+        for x in to_pop:
+            self.results.pop(x)
         
 
     def compare_fuzz_threshold(self, scr):
@@ -160,7 +160,7 @@ class orgsearch:
         else:
             matches = [(query,self.__orgnames[score[0]],score[1]) for score in fuzz_scores]
         self.results[query] = matches
-        print(matches) # run if in debug mode
+        #print(matches) # run if in debug mode
         return matches
 
         
