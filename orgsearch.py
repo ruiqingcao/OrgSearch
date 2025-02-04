@@ -10,7 +10,6 @@ class OrgSearch:
     """
     This class defines a data object that finds the closest matching organization names from a large database based on a given set of input queries.
     """
-
     def __init__(self, orgnames=[], queries=None, fuzz_threshold=[90,10], fuzz_topk=3, tf_on=True, tf_threshold=0.7, tf_topk=1):
         if len(orgnames)==0:
             self.__orgnames = []
@@ -36,13 +35,14 @@ class OrgSearch:
             self.__tf_threshold = None
             self.__tf_topk = None
     
+
     def clean_string(self,st):
         """
         Remove punctuations and convert to lower case.
         """
         return ''.join(c.lower() for c in st if c not in string.punctuation)
 
-    
+
     def load_comparison_database(self,file_or_list,varname=None):
         """
         Load the large database to query against.
@@ -85,7 +85,7 @@ class OrgSearch:
             self.__tf_model = model
         self.results = {}
 
-    
+
     def load_queries(self,queries):
         """
         Load queries (or a query).
