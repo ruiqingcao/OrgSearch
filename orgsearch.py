@@ -40,7 +40,10 @@ class OrgSearch:
         """
         Remove punctuations and convert to lower case.
         """
-        return ''.join(c.lower() for c in st if c not in string.punctuation)
+        st_split = st.split('/')
+        for item in st_split:
+            if item!='':
+                return ''.join(c.lower() for c in item if c not in string.punctuation)
 
 
     def load_comparison_database(self,file_or_list,varname=None):
