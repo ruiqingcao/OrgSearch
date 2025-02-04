@@ -1,7 +1,7 @@
 from transformers import pipeline
 
 class EntityClassifier:
-    def __init__(self, candidate_labels = ["organization","occupation"], entities = []):
+    def __init__(self, entities = [], candidate_labels = ["organization","occupation"]):
         self.__classifier = pipeline(
             "zero-shot-classification",
             model="valhalla/distilbart-mnli-12-3",
@@ -24,7 +24,7 @@ class EntityClassifier:
         for x in to_pop:
             self.results.pop(x)
 
-    def classify_bulk(self, candidate_labels=[], entities=[]):
+    def classify_bulk(self, entities=[], candidate_labels=[]):
         if len(candidate_labels)>0:
             self.update_candidate_labels(candidate_labels)
         if len(entities)>0:
