@@ -20,7 +20,10 @@ class EntityClassifier:
         self.results = {}
 
     def clean_string(self,st):
-        return st.split('/')[0].title()
+        st_split = st.split('/')
+        for item in st_split:
+            if item!='':
+                return item.title()
 
     def update_candidate_labels(self, candidate_labels):
         if self.__candidate_labels!=candidate_labels:
