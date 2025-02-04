@@ -92,6 +92,7 @@ class OrgSearch:
         """
         self.queries = queries
 
+
     def clear_results(self):
         if type(self.queries)==str:
             to_pop = set(self.results.keys()) - {self.queries}

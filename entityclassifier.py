@@ -29,7 +29,6 @@ class EntityClassifier:
             self.update_candidate_labels(candidate_labels)
         if len(entities)>0:
             self.load_entities(entities)
-
         new_entities = list(set(self.entities)-set(self.results.keys()))
         classified_outputs = self.__classifier(
             new_entities,
