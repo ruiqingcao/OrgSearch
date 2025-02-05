@@ -60,6 +60,8 @@ class OrgSearch:
         else:
             orgnames = set(pd.read_csv(file_or_list,dtype={varname:str})[varname].unique())
             orgnames = sorted(list(orgnames))
+        orgnames = [x for x in orgnames if x[0] not in string.punctuation]
+        orgnames = [x for x in orgnames if x[-1] not in '"\'(),-./:;<=>?@[\\]^_`{|}~']
         self.__orgnames = orgnames
         self.__orgnames_clean = [self.clean_string(name,clean) for name in orgnames]
         self.__cleaned_to_index = {self.__orgnames_clean[i]:i for i in range(len(self.__orgnames_clean))}
