@@ -10,7 +10,7 @@ class OrgSearch:
     """
     This class defines a data object that finds the closest matching organization names from a large database based on a given set of input queries.
     """
-    def __init__(self, orgnames=[], queries=None, fuzz_threshold=[90,10], fuzz_topk=3, tf_on=True, tf_threshold=0.7, tf_topk=1):
+    def __init__(self, orgnames=[], queries=None, fuzz_threshold=[90,10], fuzz_topk=1, tf_on=True, tf_threshold=0.7, tf_topk=1):
         if len(orgnames)==0:
             self.__orgnames = []
             self.__orgnames_clean = []
@@ -153,6 +153,16 @@ class OrgSearch:
         if query in self.results.keys():
             return self.results[query]
         q = self.clean_string(query)
+        try:
+            ind = self.__orgnames_clean.index(q)
+            if self.__tf_on:
+                matches = [(query,self.__orgnames[ind],(100,100),None)]
+            else:
+                matches = [(query,self.__orgnames[ind],(100,100))]
+            self.results[query] = matches
+            return matches
+        except:
+            None
         fuzz_scores = [[self.__cleaned_to_index[name],tuple([f(q,name) for f in self.__fuzz_methods])] for name in self.__orgnames_clean] # a list of [index, tuple of scores from the fuzz algos]
         fuzz_scores.sort(key=lambda x: x[1], reverse=True) # sort the list of scores in lexicographic order (of the fuzz method scores) from largest to smallest
         fuzz_scores = [score for score in fuzz_scores[:self.__fuzz_topk] if self.compare_fuzz_threshold(score[1])] # retain only the scores in the fuzz_topk ranks that are not lower than fuzz_thresholds         
@@ -176,7 +186,7 @@ class OrgSearch:
         if queries!=None:
             self.load_queries(queries)
         if ((fuzz_topk!=None) & (fuzz_topk!=self.__fuzz_topk)) | ((fuzz_threshold!=None) & (fuzz_threshold!=self.__fuzz_threshold)) | ((fuzz_methods!=None) & (fuzz_methods!=self.__fuzz_methods)):
-            self.update_fuzz_params(topk=topk, threshold=fuzz_threshold, methods=fuzz_methods)
+            self.update_fuzz_params(topk=fuzz_topk, threshold=fuzz_threshold, methods=fuzz_methods)
         if ((tf_on!=None) & (tf_on!=self.__tf_on)) | ((tf_topk!=None) & (tf_topk!=self.__tf_topk)) | ((tf_threshold!=None) & (tf_threshold!=self.__tf_threshold)) | ((tf_model!=None) & (tf_model!=self.__tf_model)):
             self.update_tf_params(tf_on=tf_on, topk=tf_topk, threshold=tf_threshold, model=tf_model)
         if type(self.queries)==str:
