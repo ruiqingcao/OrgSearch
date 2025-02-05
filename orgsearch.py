@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import string
+import re
 from rapidfuzz import fuzz
 from sentence_transformers import SentenceTransformer, util
 
@@ -10,13 +11,13 @@ class OrgSearch:
     """
     This class defines a data object that finds the closest matching organization names from a large database based on a given set of input queries.
     """
-    def __init__(self, orgnames=[], queries=None, fuzz_threshold=[90,10], fuzz_topk=1, tf_on=True, tf_threshold=0.7, tf_topk=1):
+    def __init__(self, orgnames=[], clean=True, queries=None, fuzz_threshold=[90,10], fuzz_topk=1, tf_on=True, tf_threshold=0.7, tf_topk=1):
         if len(orgnames)==0:
             self.__orgnames = []
             self.__orgnames_clean = []
             self.__cleaned_to_index = {}
         else:
-            self.load_comparison_database(file_or_list=orgnames)
+            self.load_comparison_database(file_or_list=orgnames, clean=clean)
         self.queries = queries
         self.results = {}
         self.__fuzz_methods = [fuzz.token_set_ratio,fuzz.token_sort_ratio]
@@ -36,17 +37,21 @@ class OrgSearch:
             self.__tf_topk = None
     
 
-    def clean_string(self,st):
+    def clean_string(self,st,clean):
         """
         Remove punctuations and convert to lower case.
         """
-        st_split = st.split('/')
-        for item in st_split:
-            if item!='':
-                return ''.join(c.lower() for c in item if c not in string.punctuation)
+        if clean:
+            st_split = st.split('/')
+            for item in st_split:
+                if item!='':
+                    punc = re.sub(r'[-]','',string.punctuation)
+                    return ''.join(c.lower() for c in item if c not in punc)
+        else:
+            return st.lower()
 
 
-    def load_comparison_database(self,file_or_list,varname=None):
+    def load_comparison_database(self,file_or_list,varname=None,clean=True):
         """
         Load the large database to query against.
         """
@@ -54,9 +59,9 @@ class OrgSearch:
             orgnames = sorted(list(file_or_list))
         else:
             orgnames = set(pd.read_csv(file_or_list,dtype={varname:str})[varname].unique())
-            orgnames = sorted(list(orgnames))            
+            orgnames = sorted(list(orgnames))
         self.__orgnames = orgnames
-        self.__orgnames_clean = [self.clean_string(name) for name in orgnames]
+        self.__orgnames_clean = [self.clean_string(name,clean) for name in orgnames]
         self.__cleaned_to_index = {self.__orgnames_clean[i]:i for i in range(len(self.__orgnames_clean))}
         self.results = {}
 
@@ -84,7 +89,7 @@ class OrgSearch:
             self.__tf_topk = topk
         if threshold is not None:
             self.__tf_threshold = threshold
-        if methods is not None:
+        if model is not None:
             self.__tf_model = model
         self.results = {}
 
@@ -152,7 +157,7 @@ class OrgSearch:
         """
         if query in self.results.keys():
             return self.results[query]
-        q = self.clean_string(query)
+        q = self.clean_string(query,clean=True)
         try:
             ind = self.__orgnames_clean.index(q)
             if self.__tf_on:
