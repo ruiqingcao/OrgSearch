@@ -56,9 +56,14 @@ class OrgSearch:
         Load the large database to query against.
         """
         if varname==None:
-            orgnames = sorted(list(file_or_list))
+            orgnames = set(file_or_list)
+            orgnames.discard(np.nan)
+            orgnames.discard(None)
+            orgnames = sorted(list(orgnames))
         else:
             orgnames = set(pd.read_csv(file_or_list,dtype={varname:str})[varname].unique())
+            orgnames.discard(np.nan)
+            orgnames.discard(None)
             orgnames = sorted(list(orgnames))
         orgnames = [x for x in orgnames if x[0] not in string.punctuation]
         orgnames = [x for x in orgnames if x[-1] not in '"\'(),-./:;<=>?@[\\]^_`{|}~']
